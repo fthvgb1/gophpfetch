@@ -1,0 +1,6 @@
+gophpfetch.iml
+gophpfetch.h
+composer.json
+composer.lock
+gophpfetch.so
+go.sum
