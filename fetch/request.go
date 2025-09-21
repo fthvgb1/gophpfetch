@@ -21,11 +21,6 @@ type ResponseItem struct {
 	Err            string            `json:"err,omitempty"`
 }
 
-type Response[Data []ResponseItem | map[string]ResponseItem] struct {
-	Results Data   `json:"results"`
-	Err     string `json:"err"`
-}
-
 type RequestItem struct {
 	Id                string            `json:"id,omitempty"`
 	Url               string            `json:"url,omitempty"`
@@ -88,16 +83,16 @@ func Request(request RequestItem) (res ResponseItem, ok bool) {
 	return
 }
 
-func ExecuteRequests(requests []RequestItem, concurrence int) (rr Response[[]ResponseItem]) {
+func ExecuteRequests(requests []RequestItem, concurrence int) (rr []ResponseItem, err error) {
 	if len(requests) < 1 {
-		rr.Err = "no valid request"
-		return rr
+		err = errors.New("no valid request")
+		return
 	}
 	requestStream := stream.NewStream(requests)
 	if concurrence < 1 {
 		concurrence = len(requests)
 	}
 	resStream := stream.ParallelFilterAndMap(requestStream, Request, concurrence)
-	rr.Results = resStream.Result()
+	rr = resStream.Result()
 	return
 }

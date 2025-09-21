@@ -8,6 +8,11 @@ import (
 	"github.com/fthvgb1/wp-go/helper/slice"
 )
 
+type Response[Data []fetch.ResponseItem | map[string]fetch.ResponseItem] struct {
+	Results Data   `json:"results"`
+	Err     string `json:"err"`
+}
+
 //export Fetch
 func Fetch(s string, concurrence int, associate int8) *C.char {
 	isAssociate := false
@@ -16,23 +21,30 @@ func Fetch(s string, concurrence int, associate int8) *C.char {
 	}
 	requests, err := helper.JsonDecode[[]fetch.RequestItem]([]byte(s))
 	if err != nil {
-		return Return(fetch.Response[[]fetch.ResponseItem]{
+		return Return(Response[[]fetch.ResponseItem]{
 			Err: err.Error(),
 		})
 	}
-	rr := fetch.ExecuteRequests(requests, concurrence)
+	rr, err := fetch.ExecuteRequests(requests, concurrence)
+	er := ""
+	if err != nil {
+		er = err.Error()
+	}
 	if isAssociate {
-		return Return(fetch.Response[map[string]fetch.ResponseItem]{
-			Results: slice.SimpleToMap(rr.Results, func(v fetch.ResponseItem) string {
+		return Return(Response[map[string]fetch.ResponseItem]{
+			Results: slice.SimpleToMap(rr, func(v fetch.ResponseItem) string {
 				return v.RequestId
 			}),
-			Err: rr.Err,
+			Err: er,
 		})
 	}
-	return Return(rr)
+	return Return(Response[[]fetch.ResponseItem]{
+		Results: rr,
+		Err:     er,
+	})
 }
 
-func Return[T []fetch.ResponseItem | map[string]fetch.ResponseItem](r fetch.Response[T]) *C.char {
+func Return[T []fetch.ResponseItem | map[string]fetch.ResponseItem](r Response[T]) *C.char {
 	re, _ := json.Marshal(r)
 	return C.CString(string(re))
 }

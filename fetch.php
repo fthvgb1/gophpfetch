@@ -16,6 +16,7 @@ class fetch
     }
 
     public FFI $ffi;
+    public array $freeVars;
 
     public function __construct()
     {
@@ -23,6 +24,12 @@ class fetch
         self::$instance = $this;
     }
 
+    public function free(): void
+    {
+        while ($var = array_pop($this->freeVars)) {
+            FFI::free($var);
+        }
+    }
 
     public static function init(): void
     {
@@ -73,6 +80,8 @@ class fetch
         FFI::memcpy($cStr, $str, $size);
         $goStr->p = $cStr;
         $goStr->n = strlen($str);
+        $this->freeVars[] = $goStr;
+        $this->freeVars[] = $cStr;
         return $goStr;
     }
 
@@ -80,6 +89,7 @@ class fetch
     {
         $r = FFI::string($cData);
         FFI::free($cData);
+        self::$instance->free();
         return $r;
     }
 }
