@@ -26,9 +26,8 @@ class fetch
 
     public function free(): void
     {
-        while ($var = array_pop($this->freeVars)) {
-            FFI::free($var);
-        }
+        array_walk($this->freeVars, fn($r) => FFI::free($r));
+        $this->freeVars = [];
     }
 
     public static function init(): void
@@ -72,16 +71,16 @@ class fetch
         return json_decode($r, true);
     }
 
-    public function makeGoString(string $str): CData
+    public static function makeGoString(string $str): CData
     {
         $goStr = self::$instance->ffi->new('GoString', false);
-        $size = strlen($str);
+        $size = mb_strlen($str);
         $cStr = FFI::new("char[$size]", false);
         FFI::memcpy($cStr, $str, $size);
         $goStr->p = $cStr;
         $goStr->n = strlen($str);
-        $this->freeVars[] = $goStr;
-        $this->freeVars[] = $cStr;
+        self::$instance->freeVars[] = $goStr;
+        self::$instance->freeVars[] = $cStr;
         return $goStr;
     }
 

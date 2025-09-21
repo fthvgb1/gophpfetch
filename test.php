@@ -12,5 +12,5 @@ $a = fetch::fetch([
     [
         'url' => '',
     ]
-], 0, true);
+]);
 print_r($a);

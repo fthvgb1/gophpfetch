@@ -14,11 +14,7 @@ type Response[Data []fetch.ResponseItem | map[string]fetch.ResponseItem] struct 
 }
 
 //export Fetch
-func Fetch(s string, concurrence int, associate int8) *C.char {
-	isAssociate := false
-	if associate > 0 {
-		isAssociate = true
-	}
+func Fetch(s string, concurrence int, associate bool) *C.char {
 	requests, err := helper.JsonDecode[[]fetch.RequestItem]([]byte(s))
 	if err != nil {
 		return Return(Response[[]fetch.ResponseItem]{
@@ -30,7 +26,7 @@ func Fetch(s string, concurrence int, associate int8) *C.char {
 	if err != nil {
 		er = err.Error()
 	}
-	if isAssociate {
+	if associate {
 		return Return(Response[map[string]fetch.ResponseItem]{
 			Results: slice.SimpleToMap(rr, func(v fetch.ResponseItem) string {
 				return v.RequestId
