@@ -1,4 +1,4 @@
-lib:
+linux:
 	go build -buildmode=c-shared -o gophpfetch.so main.go \
 	 && gcc -E -P gophpfetch.h -o gophpfetchx.h \
 	  && echo '#define FFI_LIB "./gophpfetch.so"'>gophpfetch.h \

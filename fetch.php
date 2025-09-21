@@ -6,6 +6,15 @@ use FFI\CData;
 class fetch
 {
     private static self $instance;
+
+    /**
+     * @return fetch
+     */
+    public static function getInstance(): fetch
+    {
+        return self::$instance;
+    }
+
     public FFI $ffi;
 
     public function __construct()
@@ -17,12 +26,11 @@ class fetch
 
     public static function init(): void
     {
-        self::$instance = new self();
+        self::$instance = self::$instance ?? new self();
     }
 
     /**
-     * @param array{
-     *     requests: array{
+     * @param array<array{
      *     id:string,
      *     url:string,
      *     Method:string,
@@ -33,28 +41,35 @@ class fetch
      *     timeout:int,
      *     saveFilename:string,
      *     getResponseHeader:bool
-     * }[]
-     * ,concurrency:int} $arr timeout Millisecond
+     * }> $arr timeout unit is Millisecond
+     * @param int $concurrence
+     * @param bool $associate
+     *
      * @return array{
-     *     res:array{requestId:string,
+     *     results: array<array{requestId:string,
      *     header:array<string,string>,
      *     httpStatusCode:int,
-     *     res:string
-     *     }[], err:string}
+     *     result:string
+     *     }> | array<string, array{requestId:string,
+     *     header:array<string,string>,
+     *     httpStatusCode:int,
+     *     result:string
+     *     }>, err:string}
      */
-    public static function fetch(array $arr): array
+
+    public static function fetch(array $arr, int $concurrence = 0, bool $associate = false): array
     {
-        $confStr = json_encode($arr);
-        $conf = self::$instance->makeGoString($confStr);
-        $r = self::readCString(self::$instance->ffi->Fetch($conf));
+        $requests = json_encode($arr);
+        $conf = self::$instance->makeGoString($requests);
+        $r = self::readCString(self::$instance->ffi->Fetch($conf, $concurrence, $associate));
         return json_decode($r, true);
     }
 
     public function makeGoString(string $str): CData
     {
-        $goStr = self::$instance->ffi->new('GoString', 0);
+        $goStr = self::$instance->ffi->new('GoString', false);
         $size = strlen($str);
-        $cStr = FFI::new("char[$size]", 0);
+        $cStr = FFI::new("char[$size]", false);
         FFI::memcpy($cStr, $str, $size);
         $goStr->p = $cStr;
         $goStr->n = strlen($str);
