@@ -4,6 +4,7 @@ before:
     - sudo apt install gcc-multilib
     - sudo apt install gcc-mingw-w64
     - sudo apt install libz-mingw-w64-dev
+    - sudo apt install clang
 builds:
   - binary: gophpfetch
     main: .
@@ -29,14 +30,15 @@ builds:
     goos:
       - linux
       - windows
-      #- darwin
+      - darwin
     goarch:
       - amd64
+      - arm64
     hooks:
-      post: ./script.sh {{ .Path }}
-#    ignore:
-#      - goos: windows
-#        goarch: arm64
+    #post: ./script.sh {{ .Path }}
+    ignore:
+      - goos: windows
+        goarch: arm64
 
 checksum:
   name_template: "checksums.txt"
