@@ -10,4 +10,4 @@ linux:
 macos:
 	CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -buildmode=c-shared -o gophpfetch.so main.go
 windows:
-	CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -buildmode=c-shared -o gophpfetch.so main.go
+	CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -buildmode=c-shared main.go
