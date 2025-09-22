@@ -30,19 +30,19 @@ builds:
     goos:
       - linux
       - windows
-      - darwin
+      #- darwin
     goarch:
       - amd64
-      - arm64
+      #- arm64
     hooks:
     #post: ./script.sh {{ .Path }}
-    ignore:
-      - goos: windows
-        goarch: arm64
-      - goos: linux
-        goarch: arm64
-      - goos: darwin
-        goarch: amd64
+#    ignore:
+#      - goos: windows
+#        goarch: arm64
+#      - goos: linux
+#        goarch: arm64
+#      - goos: darwin
+#        goarch: amd64
 
 checksum:
   name_template: "checksums.txt"

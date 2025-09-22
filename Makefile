@@ -8,6 +8,6 @@ linux:
 	     -e 's/typedef double _Complex GoComplex128;//g' gophpfetchx.h  \
 	   &&  cat gophpfetchx.h >> gophpfetch.h && rm gophpfetchx.h
 macos:
-	CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -buildmode=c-shared -o gophpfetch.so main.go
+	CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -buildmode=c-shared main.go
 windows:
 	CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -buildmode=c-shared main.go
