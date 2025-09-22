@@ -61,9 +61,9 @@ archives:
     wrap_in_directory: true
     format_overrides:
       - goos: windows
-        format: none
+        format: binary
       - goos: linux
-        format: none
+        format: binary
     files:
       - README.md
       - LICENSE
