@@ -8,7 +8,9 @@ import (
 	"github.com/fthvgb1/wp-go/stream"
 	"io"
 	"net/http"
+	"os"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -53,22 +55,69 @@ func Request(request RequestItem) (res ResponseItem, ok bool) {
 			return nil
 		}
 	}
+	if len(request.Header) > 0 {
+		req.Header = http.Header{}
+		for k, v := range request.Header {
+			req.Header.Set(k, v)
+		}
+	}
+	var fns []func()
+
+	if len(request.Body) > 0 {
+		err = SetBody(request, req, &fns)
+		if err != nil {
+			res.Err = err.Error()
+			return
+		}
+	}
+	defer func() {
+		if len(fns) > 0 {
+			for _, fn := range fns {
+				fn()
+			}
+		}
+	}()
 	re, err := cli.Do(req)
 	if err != nil {
 		res.Err = err.Error()
 		return
 	}
 	defer re.Body.Close()
-	if request.SaveFilename != "" {
-		err = helper.IsDirExistAndMkdir(path.Dir(request.SaveFilename), 0666)
-		if err != nil {
-			res.Err = err.Error()
-		}
-		return
-	}
 	bytes, err := io.ReadAll(re.Body)
 	if err != nil {
 		res.Err = err.Error()
+		return
+	}
+	if request.SaveFilename != "" {
+		file := strings.Split(request.SaveFilename, "|")
+		name := file[0]
+		perm := helper.Defaults(os.Getenv("uploadFileMod"), "0666")
+		if len(file) > 1 {
+			perm = file[1]
+		}
+		p, err := strconv.ParseUint(perm, 8, 32)
+		if err != nil {
+			res.Err = err.Error()
+			return
+		}
+		mod := os.FileMode(p)
+
+		dirMode := helper.Defaults(os.Getenv("uploadDirMod"), "0755")
+		d, err := strconv.ParseUint(dirMode, 8, 32)
+		if err != nil {
+			res.Err = err.Error()
+			return
+		}
+		err = helper.IsDirExistAndMkdir(path.Dir(name), os.FileMode(d))
+		if err != nil {
+			res.Err = err.Error()
+			return
+		}
+
+		err = os.WriteFile(name, bytes, mod)
+		if err != nil {
+			res.Err = err.Error()
+		}
 		return
 	}
 	res.HttpStatusCode = re.StatusCode
@@ -79,6 +128,44 @@ func Request(request RequestItem) (res ResponseItem, ok bool) {
 			m[k] = strings.Join(v, "; ")
 		}
 		res.Header = m
+	}
+	return
+}
+
+var typeInt = map[string]int{
+	"x-www-form-urlencoded": 1,
+	"form-data":             2,
+	"json":                  3,
+	"binary":                4,
+}
+
+func SetBody(r RequestItem, req *http.Request, fns *[]func()) (err error) {
+	if t, ok := typeInt[r.Header["Content-Type"]]; ok {
+		switch t {
+		case 2:
+			if files, ok := r.Body["__uploadFiles"].(map[string]any); ok && files != nil {
+				delete(r.Body, "__uploadFiles")
+				for filename, field := range files {
+					fd, err := os.Open(filename)
+					if err != nil {
+						return err
+					}
+					r.Body[field.(string)] = fd
+					*fns = append(*fns, func() {
+						fd.Close()
+					})
+				}
+			}
+		case 3:
+			if d, ok := r.Body["jsonData"]; ok && d != "" {
+				b := strings.NewReader(d.(string))
+				req.Body = io.NopCloser(b)
+				req.ContentLength = int64(b.Len())
+				req.Header.Set("Content-Type", "application/json")
+				return nil
+			}
+		}
+		err = httptool.SetBody(req, t, r.Body)
 	}
 	return
 }

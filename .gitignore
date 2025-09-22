@@ -4,3 +4,4 @@ composer.json
 composer.lock
 gophpfetch.so
 go.sum
+uploads

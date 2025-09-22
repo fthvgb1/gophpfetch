@@ -3,8 +3,17 @@
 
 use FFI\CData;
 
+enum PostType: string
+{
+    case FormUrlencoded = "x-www-form-urlencoded";
+    case FormData = "form-data";
+    case Json = "json";
+    //case Binary = "binary";
+}
+
 class fetch
 {
+
     private static self $instance;
 
     /**
@@ -48,6 +57,7 @@ class fetch
      *     saveFilename:string,
      *     getResponseHeader:bool
      * }> $arr timeout unit is Millisecond
+     * contentType PostType
      * @param int $concurrence
      * @param bool $associate
      *
@@ -65,6 +75,19 @@ class fetch
 
     public static function fetch(array $arr, int $concurrence = 0, bool $associate = false): array
     {
+        foreach ($arr as &$item) {
+            if (!isset($item['header']['Content-Type'])) {
+                continue;
+            }
+            if ($item['header']['Content-Type'] !== PostType::Json) {
+                continue;
+            }
+            if (isset($item['body']['jsonData'])) {
+                continue;
+            }
+            $item['body']['jsonData'] = json_encode($item['body']);
+        }
+        unset($item);
         $requests = json_encode($arr);
         $conf = self::$instance->makeGoString($requests);
         $r = self::readCString(self::$instance->ffi->Fetch($conf, $concurrence, $associate));
