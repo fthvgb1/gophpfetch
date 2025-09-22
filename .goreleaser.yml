@@ -1,0 +1,64 @@
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - binary: gophpfetch
+    main: .
+    buildmode: c-shared
+    env:
+      - CGO_ENABLED=1
+      - >-
+        {{- if eq .Os "windows" }}
+          {{- if eq .Arch "amd64" }}CC=x86_64-w64-mingw32-gcc{{- end }}
+        {{- end }}
+      - >-
+        {{- if eq .Os "windows" }}
+          {{- if eq .Arch "amd64" }}CXX=x86_64-w64-mingw32-g+{{- end }}
+        {{- end }}
+      - >-
+        {{- if eq .Os "darwin" }}
+          {{- if eq .Arch "amd64" }}CC=o64-clang{{- end }}
+        {{- end }}
+      - >-
+        {{- if eq .Os "darwin" }}
+          {{- if eq .Arch "amd64" }}CXX=o64-clang++{{- end }}
+        {{- end }}
+    goos:
+      - linux
+      - windows
+      #- darwin
+    goarch:
+      - amd64
+    hooks:
+      post: ./script.sh {{ .Path }}
+#    ignore:
+#      - goos: windows
+#        goarch: arm64
+
+checksum:
+  name_template: "checksums.txt"
+
+archives:
+  - name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- if eq .Os "darwin" }}macos_
+      {{- else }}{{ .Os }}_{{ end }}
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else if eq .Arch "arm64" }}aarch64
+      {{- else if eq .Arch "arm" }}armv{{ .Arm }}
+      {{- else }}{{ .Arch }}{{ end }}
+    wrap_in_directory: true
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - readme.md
+      - LICENSE
+      - none*
+
+    builds_info:
+      group: root
+      owner: root
