@@ -1,7 +1,9 @@
 before:
   hooks:
     - go mod tidy
-
+    - sudo apt install gcc-multilib
+    - sudo apt install gcc-mingw-w64
+    - sudo apt install libz-mingw-w64-dev
 builds:
   - binary: gophpfetch
     main: .
