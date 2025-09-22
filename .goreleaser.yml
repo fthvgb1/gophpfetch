@@ -23,26 +23,22 @@ builds:
         {{- if eq .Os "darwin" }}
           {{- if eq .Arch "amd64" }}CC=o64-clang{{- end }}
         {{- end }}
-      - >-
-        {{- if eq .Os "darwin" }}
-          {{- if eq .Arch "amd64" }}CXX=o64-clang++{{- end }}
-        {{- end }}
     goos:
       - linux
       - windows
       #- darwin
     goarch:
       - amd64
-      #- arm64
+      - arm64
     hooks:
-    #post: ./script.sh {{ .Path }}
-#    ignore:
-#      - goos: windows
-#        goarch: arm64
-#      - goos: linux
-#        goarch: arm64
-#      - goos: darwin
-#        goarch: amd64
+      post: ls -lh {{ .Path }}
+    ignore:
+      - goos: windows
+        goarch: arm64
+      - goos: linux
+        goarch: arm64
+      - goos: darwin
+        goarch: amd64
 
 checksum:
   name_template: "checksums.txt"
@@ -59,11 +55,7 @@ archives:
       {{- else if eq .Arch "arm" }}armv{{ .Arm }}
       {{- else }}{{ .Arch }}{{ end }}
     wrap_in_directory: true
-    format_overrides:
-      - goos: windows
-        format: binary
-      - goos: linux
-        format: binary
+    format: binary
     files:
       - README.md
       - LICENSE

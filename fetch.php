@@ -89,7 +89,7 @@ class fetch
         }
         unset($item);
         $requests = json_encode($arr);
-        $conf = self::$instance->makeGoString($requests);
+        $conf = self::makeGoString($requests);
         $r = self::readCString(self::$instance->ffi->Fetch($conf, $concurrence, $associate));
         return json_decode($r, true);
     }
