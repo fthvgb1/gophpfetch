@@ -5,7 +5,7 @@ before:
   hooks:
     - go mod tidy
 
-#dist: dist-darwin
+dist: dist-darwin
 
 builds:
   - main: .
