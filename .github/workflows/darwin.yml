@@ -1,0 +1,40 @@
+name: build-darwin
+on:
+  release:
+    types: [ created ]
+  workflow_dispatch:
+
+env:
+  GORELEASER_VERSION: 2.6.1
+
+jobs:
+  build-go-binary-darwin:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: GoReleaser (build darwin binaries)
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: ${{ env.GORELEASER_VERSION }}
+          args: build --skip-validate --clean -f .goreleaser-darwin.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+
+      - name: Upload assets (darwin)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-darwin
+          path: dist-darwin
+
+
