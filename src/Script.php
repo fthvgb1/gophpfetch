@@ -40,7 +40,7 @@ class Script
         $os = strtolower(PHP_OS_FAMILY);
         $archMap = [
             'linux' => 'linux_x86_64.so',
-            'windows', 'winnt' => 'windows_x86_64.dll',
+            'windows' => 'windows_x86_64.dll',
             'darwin' => 'darwin_' . php_uname('m') . '.dylib'
         ];
         if (!isset($archMap[$os])) {
