@@ -1,0 +1,23 @@
+{
+    "name": "gophp/gophpfetch",
+    "description": "A php http request extension on concurrence writing in golang",
+    "type": "library",
+    "homepage": "https://github.com/fthvgb1/gophpfetch",
+    "require": {
+        "php": ">=7.4",
+        "ext-ffi": "*",
+        "ext-mbstring": "*"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "GoPHP\\GoPHPFetch\\": "src/GoPHP/GoPHPFetch"
+        }
+    },
+    "authors": [
+        {
+            "name": "xing",
+            "email": "fthvgbx1@gmail.com"
+        }
+    ]
+}

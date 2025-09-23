@@ -1,9 +1,12 @@
 <?php
 
-include 'fetch.php';
+use GoPHP\GoPHPFetch\Fetch;
+use GoPHP\GoPHPFetch\PostType;
+
+include 'vendor/autoload.php';
 
 
-$a = fetch::fetch([
+$a = Fetch::fetch([
     [
         'url' => 'http://192.168.43.229:8765/',
         'method' => 'get',

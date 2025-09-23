@@ -1,25 +1,23 @@
 <?php
 
+declare(strict_types=1);
 
+namespace GoPHP\GoPHPFetch;
+
+use FFI;
 use FFI\CData;
 
-enum PostType: string
-{
-    case FormUrlencoded = "x-www-form-urlencoded";
-    case FormData = "form-data";
-    case Json = "json";
-    //case Binary = "binary";
-}
 
-class fetch
+class Fetch
 {
 
+    const VERSION = '0.2.2';
     private static self $instance;
 
     /**
-     * @return fetch
+     * @return Fetch
      */
-    public static function getInstance(): fetch
+    public static function getInstance(): Fetch
     {
         return self::$instance;
     }
@@ -29,7 +27,43 @@ class fetch
 
     public function __construct()
     {
-        $this->ffi = FFI::load('gophpfetch.h');
+        ;
+        $arch = match (strtolower(PHP_OS_FAMILY)) {
+            'linux' => 'linux_x86_64.so',
+            'windows', 'winnt' => 'windows_x86_64.dll',
+            'darwin' => 'darwin_' . php_uname('m') . '.dylib'
+        };
+
+        $this->ffi = FFI::cdef(<<<CT
+typedef long int ptrdiff_t;
+typedef long unsigned int size_t;
+typedef int wchar_t;
+typedef struct {
+  long long __max_align_ll __attribute__((__aligned__(__alignof__(long long))));
+  long double __max_align_ld __attribute__((__aligned__(__alignof__(long double))));
+} max_align_t;
+typedef struct { const char *p; ptrdiff_t n; } _GoString_;
+typedef signed char GoInt8;
+typedef unsigned char GoUint8;
+typedef short GoInt16;
+typedef unsigned short GoUint16;
+typedef int GoInt32;
+typedef unsigned int GoUint32;
+typedef long long GoInt64;
+typedef unsigned long long GoUint64;
+typedef GoInt64 GoInt;
+typedef GoUint64 GoUint;
+typedef size_t GoUintptr;
+typedef float GoFloat32;
+typedef double GoFloat64;
+typedef char _check_for_64_bit_pointer_matching_GoInt[sizeof(void*)==64/8 ? 1:-1];
+typedef _GoString_ GoString;
+typedef void *GoMap;
+typedef void *GoChan;
+typedef struct { void *t; void *v; } GoInterface;
+typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
+extern char* Fetch(GoString s, GoInt concurrence, GoUint8 associate);
+CT, __DIR__ . '/exts/gophpfetch_' . self::VERSION . '_' . $arch);
         self::$instance = $this;
     }
 
@@ -116,4 +150,4 @@ class fetch
     }
 }
 
-fetch::init();
+Fetch::init();

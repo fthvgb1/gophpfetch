@@ -1,1 +1,3 @@
-### a php http request on concurrence wrote in golang
+### a php http request extension on concurrence writing in golang
+
+use FFI call extension
