@@ -1,8 +1,8 @@
 <?php
 
-use GoPHP\GoPHPFetch\Fetch;
-use GoPHP\GoPHPFetch\PostType;
-use GoPHP\GoPHPFetch\Script;
+use Fthvgb1\GoPHPFetch\Fetch;
+use Fthvgb1\GoPHPFetch\PostType;
+use Fthvgb1\GoPHPFetch\Script;
 
 include 'vendor/autoload.php';
 

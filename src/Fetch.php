@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GoPHP\GoPHPFetch;
+namespace Fthvgb1\GoPHPFetch;
 
 use FFI;
 use FFI\CData;
