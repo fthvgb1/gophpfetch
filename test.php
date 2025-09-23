@@ -2,9 +2,11 @@
 
 use GoPHP\GoPHPFetch\Fetch;
 use GoPHP\GoPHPFetch\PostType;
+use GoPHP\GoPHPFetch\Script;
 
 include 'vendor/autoload.php';
 
+Script::checkAndDownloadExtension();
 
 $a = Fetch::fetch([
     [

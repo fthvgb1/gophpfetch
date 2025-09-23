@@ -1,6 +1,12 @@
 {
     "name": "gophp/gophpfetch",
-    "description": "A php http request extension on concurrence writing in golang",
+    "description": "A php http request extension on concurrence writing in golang, use FFI call",
+    "keywords": [
+        "FFI",
+        "golang",
+        "http",
+        "request"
+    ],
     "type": "library",
     "homepage": "https://github.com/fthvgb1/gophpfetch",
     "require": {
@@ -11,8 +17,16 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "GoPHP\\GoPHPFetch\\": "src/GoPHP/GoPHPFetch"
+            "GoPHP\\GoPHPFetch\\": "src/"
         }
+    },
+    "scripts": {
+        "pre-package-install": [
+            "GoPHP\\GoPHPFetch\\Script::checkAndDownloadExtension"
+        ],
+        "post-package-update": [
+            "GoPHP\\GoPHPFetch\\Script::checkAndDownloadExtension"
+        ]
     },
     "authors": [
         {

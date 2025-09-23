@@ -11,7 +11,6 @@ use FFI\CData;
 class Fetch
 {
 
-    const VERSION = '0.2.2';
     private static self $instance;
 
     /**
@@ -27,13 +26,6 @@ class Fetch
 
     public function __construct()
     {
-        ;
-        $arch = match (strtolower(PHP_OS_FAMILY)) {
-            'linux' => 'linux_x86_64.so',
-            'windows', 'winnt' => 'windows_x86_64.dll',
-            'darwin' => 'darwin_' . php_uname('m') . '.dylib'
-        };
-
         $this->ffi = FFI::cdef(<<<CT
 typedef long int ptrdiff_t;
 typedef long unsigned int size_t;
@@ -63,7 +55,7 @@ typedef void *GoChan;
 typedef struct { void *t; void *v; } GoInterface;
 typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern char* Fetch(GoString s, GoInt concurrence, GoUint8 associate);
-CT, __DIR__ . '/exts/gophpfetch_' . self::VERSION . '_' . $arch);
+CT, Script::getPlatformArchExtension());
         self::$instance = $this;
     }
 
