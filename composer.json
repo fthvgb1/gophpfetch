@@ -21,6 +21,9 @@
         }
     },
     "scripts": {
+        "post-install-cmd": [
+            "Fthvgb1\\GoPHPFetch\\Script::checkAndDownloadExtension"
+        ],
         "pre-package-install": [
             "Fthvgb1\\GoPHPFetch\\Script::checkAndDownloadExtension"
         ],
