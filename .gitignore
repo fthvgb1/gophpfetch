@@ -3,3 +3,4 @@ gophpfetch.so
 go.sum
 uploads
 /vendor/
+src/exts
