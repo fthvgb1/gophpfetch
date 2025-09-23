@@ -29,15 +29,10 @@ jobs:
         with:
           distribution: goreleaser
           version: ${{ env.GORELEASER_VERSION }}
-          args: build  --clean ${{ env.flags }} -f .goreleaser-darwin.yml
+          args: release  --clean ${{ env.flags }} -f .goreleaser-darwin.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
 
-      - name: Upload assets (darwin)
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-darwin
-          path: dist-darwin
 
 
