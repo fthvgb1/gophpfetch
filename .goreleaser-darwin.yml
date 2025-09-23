@@ -18,7 +18,8 @@ builds:
     goarch:
       - amd64
       - arm64
-
+checksum:
+  name_template: "checksums_darwin.txt"
 archives:
   - name_template: >-
       {{ .ProjectName }}_
@@ -33,6 +34,7 @@ archives:
     wrap_in_directory: true
     formats: binary
     files:
+      - checksums_darwin.txt
       - none*
     builds_info:
       group: root

@@ -98,7 +98,7 @@ class fetch
     {
         $goStr = self::$instance->ffi->new('GoString', false);
         $size = mb_strlen($str);
-        $cStr = FFI::new("char[$size]", false);
+        $cStr = self::$instance->ffi->new("char[$size]", false);
         FFI::memcpy($cStr, $str, $size);
         $goStr->p = $cStr;
         $goStr->n = strlen($str);
