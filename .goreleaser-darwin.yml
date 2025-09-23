@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/goreleaser/goreleaser/v2.6.1/www/docs/static/schema-pro.json
+version: 1
 
 before:
   hooks:
@@ -15,8 +16,10 @@ builds:
     goarch:
       - amd64
       - arm64
+
 checksum:
   name_template: "checksums_darwin.txt"
+
 archives:
   - name_template: >-
       {{ .ProjectName }}_
@@ -29,7 +32,7 @@ archives:
       {{- else if eq .Arch "arm" }}armv{{ .Arm }}
       {{- else }}{{ .Arch }}{{ end }}
     wrap_in_directory: true
-    formats: binary
+    format: binary
     files:
       - checksums_darwin.txt
       - none*
