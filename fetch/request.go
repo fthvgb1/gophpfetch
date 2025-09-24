@@ -1,6 +1,5 @@
 package fetch
 
-import "C"
 import (
 	"errors"
 	"github.com/fthvgb1/wp-go/helper"
