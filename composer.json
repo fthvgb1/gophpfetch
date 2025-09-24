@@ -1,6 +1,6 @@
 {
     "name": "fthvgb1/gophpfetch",
-    "description": "A php http request extension on concurrence writing in golang, use FFI call",
+    "description": "A php http request extension on concurrence writing in golang, use FFI to call",
     "keywords": [
         "FFI",
         "golang",
@@ -20,14 +20,12 @@
             "Fthvgb1\\GoPHPFetch\\": "src/"
         }
     },
+    "minimum-stability": "dev",
     "scripts": {
+        "downloadExtension": [
+            "Fthvgb1\\GoPHPFetch\\Script::checkAndDownloadExtension"
+        ],
         "post-install-cmd": [
-            "Fthvgb1\\GoPHPFetch\\Script::checkAndDownloadExtension"
-        ],
-        "pre-package-install": [
-            "Fthvgb1\\GoPHPFetch\\Script::checkAndDownloadExtension"
-        ],
-        "post-package-update": [
             "Fthvgb1\\GoPHPFetch\\Script::checkAndDownloadExtension"
         ]
     },

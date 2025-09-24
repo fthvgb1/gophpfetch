@@ -21,6 +21,7 @@ class Script
         if (!file_exists($file)) {
             $filename = basename($file);
             $url = "https://github.com/fthvgb1/gophpfetch/releases/download/v{$version}/$filename";
+            echo 'start to download ', $url, PHP_EOL;
             $data = file_get_contents($url);
             if (false === $data) {
                 throw new Exception("can't download extension file: {$url}");
@@ -29,6 +30,7 @@ class Script
             if (false === $r) {
                 throw new Exception("write extension {$file} failed!");
             }
+            echo 'completed downloading extension', PHP_EOL;
         }
     }
 

@@ -2,6 +2,27 @@
 
 use FFI to call golang http requests with concurrence.
 
+#### install
+
+add follow content to composer.json and `composer install && composer run-script post-install-cmd`.
+
+```json
+{
+  "require": {
+    "fthvgb1/gophpfetch": "*"
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "@composer downloadExtension"
+    ]
+  }
+}
+```
+
+to avoid including the unnecessary others platform's extension files, you need to download extension file manually
+
+#### example
+
 ```php
 $results = Fetch::fetch([
     [
