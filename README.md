@@ -4,7 +4,7 @@ use FFI to call golang http requests with concurrence.
 
 #### install
 
-add follow content to composer.json and `composer install && composer run-script post-install-cmd`.
+add follow contents to project's composer.json and run `composer install && composer run-script downloadExtension`.
 
 ```json
 {
@@ -12,14 +12,16 @@ add follow content to composer.json and `composer install && composer run-script
     "fthvgb1/gophpfetch": "*"
   },
   "scripts": {
-    "post-install-cmd": [
+    "downloadExtension": [
+      "@putenv COMPOSER=vendor/fthvgb1/gophpfetch/composer.json",
       "@composer downloadExtension"
     ]
-  }
+  },
+  "minimum-stability": "dev"
 }
 ```
 
-to avoid including the unnecessary others platform's extension files, you need to download extension file manually
+to avoid including the unnecessary others platform's extension files, you need to download extension file manually.
 
 #### example
 
