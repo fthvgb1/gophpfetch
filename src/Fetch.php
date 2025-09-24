@@ -77,10 +77,12 @@ CT, Script::getPlatformArchExtension());
      *     Method:string,
      *     query:array<string,mixed>,
      *     header: array<string,string>,
+     *     host: string,
+     *     jar: bool,
      *     body: array<string,string>,
      *     maxRedirectNum:int,
      *     timeout:int,
-     *     saveFilename:string,
+     *     saveFile:array{path:string,mode:string},
      *     getResponseHeader:bool
      * }> $arr timeout unit is Millisecond
      * contentType PostType
@@ -93,7 +95,7 @@ CT, Script::getPlatformArchExtension());
      *     httpStatusCode:int,
      *     result:string
      *     }> | array<string, array{requestId:string,
-     *     header:array<string,string>,
+     *     header:array<array<string,string>>,
      *     httpStatusCode:int,
      *     result:string
      *     }>, err:string}
@@ -108,10 +110,10 @@ CT, Script::getPlatformArchExtension());
             if ($item['header']['Content-Type'] !== PostType::Json) {
                 continue;
             }
-            if (isset($item['body']['jsonData'])) {
+            if (isset($item['body']['__Data'])) {
                 continue;
             }
-            $item['body']['jsonData'] = json_encode($item['body']);
+            $item['body']['__Data'] = json_encode($item['body']);
         }
         unset($item);
         $requests = json_encode($arr);

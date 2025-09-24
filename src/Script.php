@@ -9,7 +9,7 @@ use RuntimeException;
 
 class Script
 {
-    const VERSION = '0.2.2';
+    const VERSION = '1.0.0';
 
     /**
      * @throws Exception

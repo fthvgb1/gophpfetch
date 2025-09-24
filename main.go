@@ -24,6 +24,7 @@ func Fetch(s string, concurrence int, associate bool) *C.char {
 	rr, err := fetch.ExecuteRequests(requests, concurrence)
 	if err != nil {
 		r.Err = err.Error()
+		return Return(r)
 	}
 	r.Results = rr
 	if associate {

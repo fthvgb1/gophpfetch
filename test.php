@@ -44,7 +44,10 @@ $a = Fetch::fetch([
         'method' => 'get',
         'query' => ['download' => 'uploads/pic.jpg'],
         'id' => 'saveFile',
-        'saveFilename' => 'uploads/bb.jpg|0644'
+        'saveFile' => [
+            'path' => 'uploads/bb.jpg',
+            'mode' => '0644',
+        ]
     ]
 ], 0, true);
 print_r($a);

@@ -2,37 +2,121 @@ package fetch
 
 import (
 	"errors"
+	"fmt"
 	"github.com/fthvgb1/wp-go/helper"
 	"github.com/fthvgb1/wp-go/helper/httptool"
 	"github.com/fthvgb1/wp-go/stream"
 	"io"
 	"net/http"
+	"net/http/cookiejar"
 	"os"
 	"path"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 )
 
 type ResponseItem struct {
-	RequestId      string            `json:"requestId,omitempty"`
-	HttpStatusCode int               `json:"httpStatusCode,omitempty"`
-	Header         map[string]string `json:"header,omitempty"`
-	Result         string            `json:"result,omitempty"`
-	Err            string            `json:"err,omitempty"`
+	RequestId      string              `json:"requestId,omitempty"`
+	HttpStatusCode int                 `json:"httpStatusCode,omitempty"`
+	Header         []map[string]string `json:"header,omitempty"`
+	Result         string              `json:"result,omitempty"`
+	Err            string              `json:"err,omitempty"`
 }
 
 type RequestItem struct {
-	Id                string            `json:"id,omitempty"`
-	Url               string            `json:"url,omitempty"`
-	Method            string            `json:"method,omitempty"`
-	Query             map[string]any    `json:"query,omitempty"`
-	Header            map[string]string `json:"header,omitempty"`
-	Body              map[string]any    `json:"body,omitempty"`
-	MaxRedirectNum    int               `json:"maxRedirectNum,omitempty"`
-	Timeout           int               `json:"timeout,omitempty"`
-	SaveFilename      string            `json:"saveFilename,omitempty"`
-	GetResponseHeader bool              `json:"getResponseHeader,omitempty"`
+	Id                string            `json:"id"`
+	Url               string            `json:"url"`
+	Method            string            `json:"method"`
+	Query             map[string]any    `json:"query"`
+	Header            map[string]string `json:"header"`
+	Body              map[string]any    `json:"body"`
+	Host              string            `json:"host"`
+	Jar               bool              `json:"jar"`
+	MaxRedirectNum    int               `json:"maxRedirectNum"`
+	Timeout           int               `json:"timeout"`
+	SaveFile          FileSave          `json:"saveFile"`
+	GetResponseHeader bool              `json:"getResponseHeader"`
+}
+
+type FileSave struct {
+	Path string `json:"path"`
+	Mode string `json:"mode"`
+}
+
+func getMode(mode string) (os.FileMode, error) {
+	p, err := strconv.ParseUint(mode, 8, 32)
+	if err != nil {
+		return 0, err
+	}
+	return os.FileMode(p), nil
+}
+
+func saveFile(request RequestItem, bytes []byte) error {
+	fileMode, err := getMode(helper.Defaults(request.SaveFile.Mode, os.Getenv("uploadFileMod"), "0666"))
+	if err != nil {
+		return err
+	}
+	dirMode, err := getMode(helper.Defaults(os.Getenv("uploadDirMod"), "0755"))
+	if err != nil {
+		return err
+	}
+	err = helper.IsDirExistAndMkdir(path.Dir(request.SaveFile.Path), dirMode)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(request.SaveFile.Path, bytes, fileMode)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func setCheckRedirect(jar bool, num int, cli *http.Client) {
+	if jar {
+		j, _ := cookiejar.New(nil)
+		cli.Jar = j
+	}
+	cli.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if num > 0 && len(via) >= num {
+			return fmt.Errorf("stopped after %d redirects", num)
+		}
+
+		if cli.Jar != nil {
+			for k, v := range req.Response.Header {
+				if k != "Set-Cookie" {
+					req.Header[k] = v
+				}
+			}
+			re := via[len(via)-1]
+			if req.Response.Header.Get("Set-Cookie") != "" {
+				icookies := make(map[string][]*http.Cookie)
+				for _, cookie := range req.Response.Header["Set-Cookie"] {
+					item := strings.Split(cookie, "=")
+					cc := http.Cookie{Name: item[0], Value: item[1]}
+					icookies[item[0]] = []*http.Cookie{&cc}
+				}
+
+				for _, c := range re.Cookies() {
+					if _, ok := icookies[c.Name]; !ok {
+						icookies[c.Name] = []*http.Cookie{c}
+					}
+				}
+				var ss []string
+				for _, cs := range icookies {
+					for _, c := range cs {
+						ss = append(ss, c.Name+"="+c.Value)
+					}
+				}
+				slices.Sort(ss) // Ensure deterministic headers
+				req.Header.Set("Cookie", strings.Join(ss, "; "))
+			}
+
+		}
+
+		return nil
+	}
 }
 
 func Request(request RequestItem) (res ResponseItem, ok bool) {
@@ -43,19 +127,19 @@ func Request(request RequestItem) (res ResponseItem, ok bool) {
 		res.Err = err.Error()
 		return
 	}
+	if request.Host != "" {
+		req.Host = request.Host
+	}
+	if request.Jar || request.MaxRedirectNum > 0 {
+		setCheckRedirect(request.Jar, request.MaxRedirectNum, cli)
+	}
+
 	if request.Timeout > 0 {
 		cli.Timeout = time.Duration(request.Timeout) * time.Millisecond
 	}
-	if request.MaxRedirectNum > 0 {
-		cli.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-			if len(via) >= request.MaxRedirectNum {
-				return errors.New("stopped after 10 redirects")
-			}
-			return nil
-		}
-	}
+
+	req.Header = http.Header{}
 	if len(request.Header) > 0 {
-		req.Header = http.Header{}
 		for k, v := range request.Header {
 			req.Header.Set(k, v)
 		}
@@ -63,8 +147,7 @@ func Request(request RequestItem) (res ResponseItem, ok bool) {
 	var fns []func()
 
 	if len(request.Body) > 0 {
-		err = SetBody(request, req, &fns)
-		if err != nil {
+		if err = SetBody(request, req, &fns); err != nil {
 			res.Err = err.Error()
 			return
 		}
@@ -87,47 +170,29 @@ func Request(request RequestItem) (res ResponseItem, ok bool) {
 		res.Err = err.Error()
 		return
 	}
-	if request.SaveFilename != "" {
-		file := strings.Split(request.SaveFilename, "|")
-		name := file[0]
-		perm := helper.Defaults(os.Getenv("uploadFileMod"), "0666")
-		if len(file) > 1 {
-			perm = file[1]
-		}
-		p, err := strconv.ParseUint(perm, 8, 32)
-		if err != nil {
-			res.Err = err.Error()
-			return
-		}
-		mod := os.FileMode(p)
 
-		dirMode := helper.Defaults(os.Getenv("uploadDirMod"), "0755")
-		d, err := strconv.ParseUint(dirMode, 8, 32)
-		if err != nil {
-			res.Err = err.Error()
-			return
+	res.HttpStatusCode = re.StatusCode
+	if request.GetResponseHeader {
+		resp := re
+		for {
+			m := make(map[string]string)
+			for k, v := range resp.Header {
+				m[k] = strings.Join(v, "; ")
+			}
+			res.Header = append(res.Header, m)
+			if resp.Request.Response == nil {
+				break
+			}
+			resp = re.Request.Response
 		}
-		err = helper.IsDirExistAndMkdir(path.Dir(name), os.FileMode(d))
-		if err != nil {
-			res.Err = err.Error()
-			return
-		}
-
-		err = os.WriteFile(name, bytes, mod)
-		if err != nil {
+	}
+	if request.SaveFile.Path != "" {
+		if err = saveFile(request, bytes); err != nil {
 			res.Err = err.Error()
 		}
 		return
 	}
-	res.HttpStatusCode = re.StatusCode
 	res.Result = string(bytes)
-	if request.GetResponseHeader {
-		m := make(map[string]string)
-		for k, v := range re.Header {
-			m[k] = strings.Join(v, "; ")
-		}
-		res.Header = m
-	}
 	return
 }
 
@@ -135,37 +200,45 @@ var typeInt = map[string]int{
 	"x-www-form-urlencoded": 1,
 	"form-data":             2,
 	"json":                  3,
-	"binary":                4,
+	"plain":                 4,
+	"binary":                5,
+}
+
+var contentMap = map[int]string{
+	3: "application/json",
+	4: "text/plain",
 }
 
 func SetBody(r RequestItem, req *http.Request, fns *[]func()) (err error) {
-	if t, ok := typeInt[r.Header["Content-Type"]]; ok {
-		switch t {
-		case 2:
-			if files, ok := r.Body["__uploadFiles"].(map[string]any); ok && files != nil {
-				delete(r.Body, "__uploadFiles")
-				for filename, field := range files {
-					fd, err := os.Open(filename)
-					if err != nil {
-						return err
-					}
-					r.Body[field.(string)] = fd
-					*fns = append(*fns, func() {
-						fd.Close()
-					})
+	t, ok := typeInt[r.Header["Content-Type"]]
+	if !ok && strings.ToLower(r.Method) == "post" {
+		t = 1
+	}
+	switch t {
+	case 2:
+		if files, ok := r.Body["__uploadFiles"].(map[string]any); ok && files != nil {
+			delete(r.Body, "__uploadFiles")
+			for filename, field := range files {
+				fd, err := os.Open(filename)
+				if err != nil {
+					return err
 				}
-			}
-		case 3:
-			if d, ok := r.Body["jsonData"]; ok && d != "" {
-				b := strings.NewReader(d.(string))
-				req.Body = io.NopCloser(b)
-				req.ContentLength = int64(b.Len())
-				req.Header.Set("Content-Type", "application/json")
-				return nil
+				r.Body[field.(string)] = fd
+				*fns = append(*fns, func() {
+					fd.Close()
+				})
 			}
 		}
-		err = httptool.SetBody(req, t, r.Body)
+	case 3, 4:
+		if d, ok := r.Body["__Data"]; ok && d != "" {
+			b := strings.NewReader(d.(string))
+			req.Body = io.NopCloser(b)
+			req.ContentLength = int64(b.Len())
+			req.Header.Set("Content-Type", contentMap[t])
+			return nil
+		}
 	}
+	err = httptool.SetBody(req, t, r.Body)
 	return
 }
 
