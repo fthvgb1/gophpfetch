@@ -82,16 +82,16 @@ CT, Script::getPlatformArchExtension());
      *     body: array<string,string>,
      *     maxRedirectNum:int,
      *     timeout:int,
-     *     saveFile:array{path:string,mode:string},
+     *     saveFile:array{path:string,mode:string,dirMode:string},
      *     getResponseHeader:bool
      * }> $arr timeout unit is Millisecond
      * contentType PostType
-     * @param int $concurrence
-     * @param bool $associate
+     * @param int $concurrence 0 unlimited
+     * @param bool $associate true can return associate array
      *
      * @return array{
      *     results: array<array{requestId:string,
-     *     header:array<string,string>,
+     *     header:array<array<string,string>>,
      *     httpStatusCode:int,
      *     result:string
      *     }> | array<string, array{requestId:string,

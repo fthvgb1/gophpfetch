@@ -41,8 +41,9 @@ type RequestItem struct {
 }
 
 type FileSave struct {
-	Path string `json:"path"`
-	Mode string `json:"mode"`
+	Path    string `json:"path"`
+	Mode    string `json:"mode"`
+	DirMode string `json:"dirMode"`
 }
 
 func getMode(mode string) (os.FileMode, error) {
@@ -58,7 +59,7 @@ func saveFile(request RequestItem, bytes []byte) error {
 	if err != nil {
 		return err
 	}
-	dirMode, err := getMode(helper.Defaults(os.Getenv("uploadDirMod"), "0755"))
+	dirMode, err := getMode(helper.Defaults(request.SaveFile.DirMode, os.Getenv("uploadDirMod"), "0755"))
 	if err != nil {
 		return err
 	}
@@ -83,38 +84,38 @@ func setCheckRedirect(jar bool, num int, cli *http.Client) {
 			return fmt.Errorf("stopped after %d redirects", num)
 		}
 
-		if cli.Jar != nil {
-			for k, v := range req.Response.Header {
-				if k != "Set-Cookie" {
-					req.Header[k] = v
-				}
+		if !jar {
+			return nil
+		}
+		for k, v := range req.Response.Header {
+			if k != "Set-Cookie" {
+				req.Header[k] = v
 			}
-			re := via[len(via)-1]
-			if req.Response.Header.Get("Set-Cookie") != "" {
-				icookies := make(map[string][]*http.Cookie)
-				for _, cookie := range req.Response.Header["Set-Cookie"] {
-					item := strings.Split(cookie, "=")
-					cc := http.Cookie{Name: item[0], Value: item[1]}
-					icookies[item[0]] = []*http.Cookie{&cc}
-				}
-
-				for _, c := range re.Cookies() {
-					if _, ok := icookies[c.Name]; !ok {
-						icookies[c.Name] = []*http.Cookie{c}
-					}
-				}
-				var ss []string
-				for _, cs := range icookies {
-					for _, c := range cs {
-						ss = append(ss, c.Name+"="+c.Value)
-					}
-				}
-				slices.Sort(ss) // Ensure deterministic headers
-				req.Header.Set("Cookie", strings.Join(ss, "; "))
-			}
-
+		}
+		re := via[len(via)-1]
+		if req.Response.Header.Get("Set-Cookie") == "" {
+			return nil
+		}
+		icookies := make(map[string][]*http.Cookie)
+		for _, cookie := range req.Response.Header["Set-Cookie"] {
+			item := strings.Split(cookie, "=")
+			cc := http.Cookie{Name: item[0], Value: item[1]}
+			icookies[item[0]] = []*http.Cookie{&cc}
 		}
 
+		for _, c := range re.Cookies() {
+			if _, ok := icookies[c.Name]; !ok {
+				icookies[c.Name] = []*http.Cookie{c}
+			}
+		}
+		var ss []string
+		for _, cs := range icookies {
+			for _, c := range cs {
+				ss = append(ss, c.Name+"="+c.Value)
+			}
+		}
+		slices.Sort(ss) // Ensure deterministic headers
+		req.Header.Set("Cookie", strings.Join(ss, "; "))
 		return nil
 	}
 }
