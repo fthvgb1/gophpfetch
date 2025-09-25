@@ -21,7 +21,8 @@ add follow contents to project's composer.json and run `composer install && comp
 }
 ```
 
-to avoid including the unnecessary others platform's extension files, you need to download extension file manually.
+to avoid including the unnecessary others platform's extension files, you need to download extension file manually
+in [release](https://github.com/fthvgb1/gophpfetch/releases).
 
 #### example
 
@@ -63,8 +64,9 @@ $results = Fetch::fetch([
         'query' => ['download' => 'uploads/pic.jpg'],
         'id' => 'saveFile',
         'saveFile' => [
-            'path'=>'uploads/bb.jpg',
-            'mode'=>'0644',
+            'path' => 'uploads/bb.jpg',
+            'mode' => '0644', //default
+            'dirMode '=> '0755' //default
         ]
     ]
 ]);
