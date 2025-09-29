@@ -54,7 +54,7 @@ func getMode(mode string) (os.FileMode, error) {
 	return os.FileMode(p), nil
 }
 
-func saveFile(request RequestItem, bytes []byte) error {
+func saveFile(request RequestItem, body io.ReadCloser) error {
 	fileMode, err := getMode(helper.Defaults(request.SaveFile.Mode, os.Getenv("uploadFileMod"), "0666"))
 	if err != nil {
 		return err
@@ -67,7 +67,11 @@ func saveFile(request RequestItem, bytes []byte) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(request.SaveFile.Path, bytes, fileMode)
+	file, err := os.OpenFile(request.SaveFile.Path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, fileMode)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(file, body)
 	if err != nil {
 		return err
 	}
@@ -166,12 +170,6 @@ func Request(request RequestItem) (res ResponseItem, ok bool) {
 		return
 	}
 	defer re.Body.Close()
-	bytes, err := io.ReadAll(re.Body)
-	if err != nil {
-		res.Err = err.Error()
-		return
-	}
-
 	res.HttpStatusCode = re.StatusCode
 	if request.GetResponseHeader {
 		resp := re
@@ -188,11 +186,17 @@ func Request(request RequestItem) (res ResponseItem, ok bool) {
 		}
 	}
 	if request.SaveFile.Path != "" {
-		if err = saveFile(request, bytes); err != nil {
+		if err = saveFile(request, re.Body); err != nil {
 			res.Err = err.Error()
 		}
 		return
 	}
+	bytes, err := io.ReadAll(re.Body)
+	if err != nil {
+		res.Err = err.Error()
+		return
+	}
+
 	res.Result = string(bytes)
 	return
 }
