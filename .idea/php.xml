@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="PhpIncludePathManager">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/perftools/php-profiler" />
+    </include_path>
+  </component>
   <component name="PhpInterpreters">
     <interpreters>
       <interpreter id="0bd3dbab-f3cc-4cca-8187-b7d14ae578c6" name="gophpffi:latest" home="docker://DATA" debugger_id="php.debugger.XDebug">
+        <configuration_options>
+          <configuration_option name="xdebug.client_host" value="192.168.43.229" />
+        </configuration_options>
         <remote_data INTERPRETER_PATH="php" HELPERS_PATH="/opt/.phpstorm_helpers" INITIALIZED="false" VALID="true" RUN_AS_ROOT_VIA_SUDO="false" DOCKER_ACCOUNT_NAME="Docker" DOCKER_IMAGE_NAME="gophpffi:latest" DOCKER_REMOTE_PROJECT_PATH="/opt/project" />
       </interpreter>
     </interpreters>
@@ -67,6 +76,7 @@
   <component name="PhpRuntimeConfiguration">
     <extensions>
       <extension name="FFI" enabled="true" />
+      <extension name="swoole" enabled="true" />
     </extensions>
   </component>
 </project>

@@ -16,8 +16,7 @@ add follow contents to project's composer.json and run `composer install && comp
       "@putenv COMPOSER=vendor/fthvgb1/gophpfetch/composer.json",
       "@composer downloadExtension"
     ]
-  },
-  "minimum-stability": "dev"
+  }
 }
 ```
 
@@ -29,46 +28,45 @@ in [release](https://github.com/fthvgb1/gophpfetch/releases).
 ```php
 $results = Fetch::fetch([
     [
-        'url' => 'http://192.168.43.229:8765/',
+        'url' => 'download url',
         'method' => 'get',
-        'timeout' => 5000
-    ],
-    [
-        'url' => 'http://192.168.43.229:8765',
-        'id' => 'query',
-        'method' => 'post',
-        'header' => ['Content-Type' => PostType::Json],
-        'body' => [
-            "action" => "findNotes",
-            "version" => 6,
-            "params" => [
-                "query" => 'deck:生词 "正面:proactive inactive proactively inactively interactive interactively interactivity"'
-            ]
-        ]
-    ],
-    [
-        'url' => 'http://192.168.43.229:12333/server.php',
-        'id' => 'upload',
-        'method' => 'post',
-        'header' => ['Content-Type' => PostType::FormData],
-        'body' => [
-            'upload' => 'hello php',
-            '__uploadFiles' => [
-                './pic.jpg' => 'aa.jpg'
-            ]
-        ]
-    ],
-    [
-        'url' => 'http://192.168.43.229:12333/server.php',
-        'method' => 'get',
-        'query' => ['download' => 'uploads/pic.jpg'],
-        'id' => 'saveFile',
+        'query' => ['query param' => 'value'],
+        'id' => 'dowload file',
         'saveFile' => [
-            'path' => 'uploads/bb.jpg',
+            'path' => 'save path',
             'mode' => '0644', //default
             'dirMode '=> '0755' //default
+        ]
+    ],
+    [
+        'url' => 'upload url',
+        'method' => 'post',
+        'id' => 'upload file',
+        'header' => ['Content-Type' => PostType::FormData],
+        'body' => [
+            '__uploadFiles' => [
+                'local file' => 'field'
+            ]
         ]
     ]
 ]);
 
 ```
+
+#### perform comparison
+
+upload 5 files and download 5 files in a request on concurrence
+
+results:
+
+|        | gophpfetch                                               | multiple curl                                              | swoole curl                                              |
+|--------|----------------------------------------------------------|------------------------------------------------------------|----------------------------------------------------------|
+| xdebug | ![](performtestandcomparison\pics\xdebug-gophpfetch.png) | ![](performtestandcomparison\pics\xdebug-multiplecurl.png) | ![](performtestandcomparison\pics\xdebug-swoolecurl.png) |
+| xhprof | ![](performtestandcomparison\pics\xhprof-overview.png)   |||
+|        | ![](performtestandcomparison\pics\xhprof-gophpfetch.png) | ![](performtestandcomparison\pics\xhprof-multiplecurl.png) | ![](performtestandcomparison\pics\xhprof-swoolecurl.png) |
+
+test method and scripts [see here](performtestandcomparison/readme.md)
+
+#### reference
+
+[dwdcth/php_golang_ffi](https://github.com/dwdcth/php_golang_ffi)

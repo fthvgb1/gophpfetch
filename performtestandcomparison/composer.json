@@ -1,0 +1,39 @@
+{
+  "description": "test gophpfetch perform and compare with multiple curl, swoole curl",
+  "keywords": [
+    "FFI",
+    "golang",
+    "http",
+    "request",
+    "swoole",
+    "multiplecurl"
+  ],
+  "type": "library",
+  "homepage": "https://github.com/fthvgb1/gophpfetch",
+  "require": {
+    "php": ">=8.1",
+    "fthvgb1/gophpfetch": "*",
+    "ext-ffi": "*",
+    "ext-mbstring": "*",
+    "ext-curl": "*",
+    "ext-swoole": "*",
+    "ext-xhprof": "*",
+    "perftools/php-profiler": "dev-main"
+  },
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "scripts": {
+    "downloadExtension": [
+      "Fthvgb1\\GoPHPFetch\\Script::checkAndDownloadExtension"
+    ],
+    "post-install-cmd": [
+      "Fthvgb1\\GoPHPFetch\\Script::checkAndDownloadExtension"
+    ]
+  },
+  "authors": [
+    {
+      "name": "xing",
+      "email": "fthvgbx1@gmail.com"
+    }
+  ]
+}

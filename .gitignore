@@ -4,3 +4,7 @@ go.sum
 uploads
 /vendor/
 src/exts
+imgs
+profiles
+performtestandcomparison/vendor
+performtestandcomparison/composer.lock
