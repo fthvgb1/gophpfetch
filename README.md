@@ -59,11 +59,39 @@ upload 5 files and download 5 files in a request on concurrence
 
 results:
 
-|        | gophpfetch                                               | multiple curl                                              | swoole curl                                              |
-|--------|----------------------------------------------------------|------------------------------------------------------------|----------------------------------------------------------|
-| xdebug | ![](performtestandcomparison\pics\xdebug-gophpfetch.png) | ![](performtestandcomparison\pics\xdebug-multiplecurl.png) | ![](performtestandcomparison\pics\xdebug-swoolecurl.png) |
-| xhprof | ![](performtestandcomparison\pics\xhprof-overview.png)   |||
-|        | ![](performtestandcomparison\pics\xhprof-gophpfetch.png) | ![](performtestandcomparison\pics\xhprof-multiplecurl.png) | ![](performtestandcomparison\pics\xhprof-swoolecurl.png) |
+
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>gophpfetch</th>
+            <th>multiple curl</th>
+            <th>swoole curl</th>
+        </tr>
+    </thead>   
+    <tbody>
+        <tr>
+            <td>xdebug</td>
+            <td><img src="performtestandcomparison/pics/xdebug-gophpfetch.webp" alt="">
+            </td>
+            <td>
+                <img src="performtestandcomparison/pics/xdebug-multiplecurl.webp" alt="">
+            </td>
+            <td><img src="performtestandcomparison/pics/xdebug-swoolecurl.webp" alt=""></td>
+        </tr>
+        <tr>
+            <td rowspan="2">xhprof</td>
+            <td colspan="3"><img src="performtestandcomparison/pics/xhprof-overview.webp" alt=""></td>
+        </tr>
+        <tr>
+            <td><img src="performtestandcomparison/pics/xhprof-gophpfetch.webp" alt=""></td>
+            <td><img src="performtestandcomparison/pics/xhprof-multiplecurl.webp" alt=""></td>
+            <td><img src="performtestandcomparison/pics/xhprof-swoolecurl.webp" alt=""></td>
+        </tr>
+    </tbody>
+</table>
+
+
 
 test method and scripts [see here](performtestandcomparison/readme.md)
 
