@@ -79,6 +79,7 @@ CT, Script::getPlatformArchExtension());
      *     header: array<string,string>,
      *     host: string,
      *     jar: bool,
+     *     noReturn: bool,
      *     body: array<string,string>,
      *     maxRedirectNum:int,
      *     timeout:int,
@@ -88,20 +89,21 @@ CT, Script::getPlatformArchExtension());
      * contentType PostType
      * @param int $concurrence 0 unlimited
      * @param bool $associate true can return associate array
+     * @param bool $decode json decode results
      *
      * @return array{
      *     results: array<array{requestId:string,
      *     header:array<array<string,string>>,
      *     httpStatusCode:int,
-     *     result:string
+     *     result:string|void
      *     }> | array<string, array{requestId:string,
      *     header:array<array<string,string>>,
      *     httpStatusCode:int,
-     *     result:string
-     *     }>, err:string}
+     *     result:string|void
+     *     }>, err:string}|string
      */
 
-    public static function fetch(array $arr, int $concurrence = 0, bool $associate = false): array
+    public static function fetch(array $arr, int $concurrence = 0, bool $associate = false, bool $decode = true): array|string
     {
         foreach ($arr as &$item) {
             if (!isset($item['header']['Content-Type'])) {
@@ -119,7 +121,7 @@ CT, Script::getPlatformArchExtension());
         $requests = json_encode($arr);
         $conf = self::makeGoString($requests);
         $r = self::readCString(self::$instance->ffi->Fetch($conf, $concurrence, $associate));
-        return json_decode($r, true);
+        return $decode ? json_decode($r, true) : $r;
     }
 
     public static function makeGoString(string $str): CData

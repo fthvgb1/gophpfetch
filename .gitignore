@@ -3,6 +3,7 @@ gophpfetch.so
 go.sum
 uploads
 /vendor/
+/vendors/
 src/exts
 imgs
 profiles

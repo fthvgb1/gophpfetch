@@ -32,6 +32,7 @@ type RequestItem struct {
 	Query             map[string]any    `json:"query"`
 	Header            map[string]string `json:"header"`
 	Body              map[string]any    `json:"body"`
+	NoReturn          bool              `json:"noReturn"`
 	Host              string            `json:"host"`
 	Jar               bool              `json:"jar"`
 	MaxRedirectNum    int               `json:"maxRedirectNum"`
@@ -84,7 +85,7 @@ func setCheckRedirect(jar bool, num int, cli *http.Client) {
 		cli.Jar = j
 	}
 	cli.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-		if num > 0 && len(via) >= num {
+		if len(via) >= num {
 			return fmt.Errorf("stopped after %d redirects", num)
 		}
 
@@ -136,9 +137,8 @@ func Request(request RequestItem) (res ResponseItem, ok bool) {
 		req.Host = request.Host
 	}
 	if request.Jar || request.MaxRedirectNum > 0 {
-		setCheckRedirect(request.Jar, request.MaxRedirectNum, cli)
+		setCheckRedirect(request.Jar, helper.Defaults(request.MaxRedirectNum, 10), cli)
 	}
-
 	if request.Timeout > 0 {
 		cli.Timeout = time.Duration(request.Timeout) * time.Millisecond
 	}
@@ -189,6 +189,9 @@ func Request(request RequestItem) (res ResponseItem, ok bool) {
 		if err = saveFile(request, re.Body); err != nil {
 			res.Err = err.Error()
 		}
+		return
+	}
+	if request.NoReturn {
 		return
 	}
 	bytes, err := io.ReadAll(re.Body)

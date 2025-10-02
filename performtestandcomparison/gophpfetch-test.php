@@ -6,6 +6,8 @@ include 'vendor/autoload.php';
 include 'lib/profile.php';
 
 $_ENV['caller'] = 'go';
-$a = Fetch::fetch(include 'requests.php', 0, 0);
+echo 'gophpfetch:', PHP_EOL;
+$a = Fetch::fetch(include 'requests.php');
 print_r($a);
+echo PHP_EOL;
 

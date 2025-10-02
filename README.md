@@ -27,6 +27,20 @@ in [release](https://github.com/fthvgb1/gophpfetch/releases).
 
 ```php
 $results = Fetch::fetch([
+     [
+        'url' => 'url',
+        'method' => 'get',//default 
+        'id' => 'get request',
+        'query' => ['query param' => 'values']
+    ],
+    [
+        'url' => 'url',
+        'id' => 'post request',
+        'body' => ['post body param' => 'values'],
+        'header' => [
+            'Content-Type' => PostType::FormUrlencoded, //default post type
+        ] 
+    ],
     [
         'url' => 'download url',
         'method' => 'get',

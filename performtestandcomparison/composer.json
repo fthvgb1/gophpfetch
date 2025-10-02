@@ -30,6 +30,11 @@
       "Fthvgb1\\GoPHPFetch\\Script::checkAndDownloadExtension"
     ]
   },
+  "autoload": {
+    "psr-4": {
+      "Fthvgb1\\GoPHPFetch\\": "../src/"
+    }
+  },
   "authors": [
     {
       "name": "xing",
