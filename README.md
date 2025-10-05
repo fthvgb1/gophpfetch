@@ -4,8 +4,7 @@ use FFI to call golang http requests with concurrence.
 
 #### install
 
-add follow contents to project's composer.json and run `composer install && composer run-script downloadExtension`.
-
+- add follow contents to project's composer.json and run `composer install && composer run-script downloadExtension`.
 ```json
 {
   "require": {
@@ -22,6 +21,13 @@ add follow contents to project's composer.json and run `composer install && comp
 
 to avoid including the unnecessary others platform's extension files, you need to download extension file manually
 in [release](https://github.com/fthvgb1/gophpfetch/releases).
+
+- enable ffi extension add follow config to php.ini or ffi.ini to using in php-fpm
+
+```
+extension=ffi.so
+ffi.enable=true
+```
 
 #### example
 
