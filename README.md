@@ -67,7 +67,7 @@ $results = Fetch::fetch([
 
 ```
 
-#### perform comparison
+#### performance comparison
 
 upload 5 files and download 5 files in a request on concurrence
 

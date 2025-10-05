@@ -10,7 +10,7 @@ return [
         'header' => ['Content-Type' => PostType::FormData],
         'body' => [
             '__uploadFiles' => [
-                'imgs/1.jpg' => 'uploads/1-' . $_ENV['caller'] . '-05.jpg'
+                __DIR__ . '/imgs/1.jpg' => 'uploads/1-' . $_ENV['caller'] . '-05.jpg'
             ]
         ]
     ],
@@ -21,7 +21,7 @@ return [
         'header' => ['Content-Type' => PostType::FormData],
         'body' => [
             '__uploadFiles' => [
-                'imgs/2.jpg' => 'uploads/2-' . $_ENV['caller'] . '.jpg'
+                __DIR__ . '/imgs/2.jpg' => 'uploads/2-' . $_ENV['caller'] . '.jpg'
             ]
         ]
     ],
@@ -32,7 +32,7 @@ return [
         'header' => ['Content-Type' => PostType::FormData],
         'body' => [
             '__uploadFiles' => [
-                'imgs/3.jpg' => 'uploads/3-' . $_ENV['caller'] . '.jpg'
+                __DIR__ . '/imgs/3.jpg' => 'uploads/3-' . $_ENV['caller'] . '.jpg'
             ]
         ]
     ],
@@ -43,7 +43,7 @@ return [
         'header' => ['Content-Type' => PostType::FormData],
         'body' => [
             '__uploadFiles' => [
-                'imgs/4.jpg' => 'uploads/4-' . $_ENV['caller'] . '.jpg'
+                __DIR__ . '/imgs/4.jpg' => 'uploads/4-' . $_ENV['caller'] . '.jpg'
             ]
         ]
     ],
@@ -54,7 +54,7 @@ return [
         'header' => ['Content-Type' => PostType::FormData],
         'body' => [
             '__uploadFiles' => [
-                'imgs/5.jpg' => 'uploads/5-' . $_ENV['caller'] . '.jpg'
+                __DIR__ . '/imgs/5.jpg' => 'uploads/5-' . $_ENV['caller'] . '.jpg'
             ]
         ]
     ],

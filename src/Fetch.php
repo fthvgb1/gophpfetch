@@ -24,6 +24,12 @@ class Fetch
     public FFI $ffi;
     public array $freeVars;
 
+    public function preload(): void
+    {
+        $this->ffi = FFI::scope('gophpfetch');
+        self::$instance = $this;
+    }
+
     public function __construct()
     {
         $this->ffi = FFI::cdef(<<<CT

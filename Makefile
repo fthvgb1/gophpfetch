@@ -1,5 +1,5 @@
 linux:
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildmode=c-shared -o gophpfetch.so main.go \
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -mod=mod -buildmode=c-shared -o gophpfetch.so main.go \
 	 && gcc -E -P gophpfetch.h -o gophpfetchx.h \
 	  && echo '#define FFI_LIB "./gophpfetch.so"'>gophpfetch.h \
 	  && sed -i -e 's/extern size_t _GoStringLen(_GoString_ s);//g' \

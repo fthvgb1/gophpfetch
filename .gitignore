@@ -5,6 +5,11 @@ uploads
 /vendor/
 /vendors/
 src/exts
+go
+a.php
+mods-available
+default.conf
+www.conf
 imgs
 profiles
 performtestandcomparison/vendor
