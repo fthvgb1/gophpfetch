@@ -27,8 +27,8 @@ function buildCurls(array $requests, $multiple = false): WeakMap
                     $opts[CURLOPT_POSTFIELDS] = $request['body']['__Data'];
                     break;
                 case PostType::FormData:
-                    foreach ($request['body']['__uploadFiles'] as $local => $target) {
-                        $opts[CURLOPT_POSTFIELDS][$target] = new CURLFile($local);
+                    foreach ($request['body']['__uploadFiles'] as $field => $filename) {
+                        $opts[CURLOPT_POSTFIELDS][$field] = new CURLFile($filename);
                     }
                     unset($request['body']['__uploadFiles']);
                     $opts[CURLOPT_POSTFIELDS] = array_merge($request['body'], $opts[CURLOPT_POSTFIELDS]);
@@ -38,7 +38,9 @@ function buildCurls(array $requests, $multiple = false): WeakMap
                     $opts[CURLOPT_POSTFIELDS] = $request['body'];
                     break;
             }
-
+            if (isset($request['callback']) && is_callable($request['callback'])) {
+                call_user_func_array($request['callback'], [$ch, &$opts]);
+            }
         }
 
         curl_setopt_array($ch, $opts);

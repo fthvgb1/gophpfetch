@@ -226,12 +226,13 @@ func SetBody(r RequestItem, req *http.Request, fns *[]func()) (err error) {
 	case 2:
 		if files, ok := r.Body["__uploadFiles"].(map[string]any); ok && files != nil {
 			delete(r.Body, "__uploadFiles")
-			for filename, field := range files {
+			for field, file := range files {
+				filename := file.(string)
 				fd, err := os.Open(filename)
 				if err != nil {
 					return err
 				}
-				r.Body[field.(string)] = fd
+				r.Body[field] = fd
 				*fns = append(*fns, func() {
 					fd.Close()
 				})

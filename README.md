@@ -65,7 +65,7 @@ $results = Fetch::fetch([
         'header' => ['Content-Type' => PostType::FormData],
         'body' => [
             '__uploadFiles' => [
-                'local file' => 'field'
+                'field' => 'local file'
             ]
         ]
     ]

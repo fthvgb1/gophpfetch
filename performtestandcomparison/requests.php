@@ -2,9 +2,10 @@
 
 use Fthvgb1\GoPHPFetch\PostType;
 
+$uploadServer = $_ENV['uploadServer'] ?? 'http://192.168.43.229:17778/upload';
 return [
     [
-        'url' => 'http://192.168.43.229:17778/upload',
+        'url' => $uploadServer,
         'id' => 'upload-1',
         'method' => 'post',
         'header' => ['Content-Type' => PostType::FormData],
@@ -15,7 +16,7 @@ return [
         ]
     ],
     [
-        'url' => 'http://192.168.43.229:17778/upload',
+        'url' => $uploadServer,
         'method' => 'post',
         'id' => 'upload-2',
         'header' => ['Content-Type' => PostType::FormData],
@@ -26,7 +27,7 @@ return [
         ]
     ],
     [
-        'url' => 'http://192.168.43.229:17778/upload',
+        'url' => $uploadServer,
         'method' => 'post',
         'id' => 'upload-3',
         'header' => ['Content-Type' => PostType::FormData],
@@ -37,7 +38,7 @@ return [
         ]
     ],
     [
-        'url' => 'http://192.168.43.229:17778/upload',
+        'url' => $uploadServer,
         'id' => 'upload-4',
         'method' => 'post',
         'header' => ['Content-Type' => PostType::FormData],
@@ -48,7 +49,7 @@ return [
         ]
     ],
     [
-        'url' => 'http://192.168.43.229:17778/upload',
+        'url' => $uploadServer,
         'id' => 'upload-5',
         'method' => 'post',
         'header' => ['Content-Type' => PostType::FormData],
